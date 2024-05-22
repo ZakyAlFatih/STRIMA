@@ -75,34 +75,4 @@ if itemtotal > 0:
 
 
 
-# # Kapasitas maksimal ransel
-# max_capacity = 20
 
-# # Algoritma greedy berdasarkan berat
-# def greedy_by_weight(items, max_capacity):
-#     # Mengurutkan barang berdasarkan berat dari yang terendah
-#     items = sorted(items, key=lambda x: x['weight'])
-    
-#     total_weight = 0
-#     total_profit = 0
-#     selected_items = []
-
-#     for item in items:
-#         if total_weight + item['weight'] <= max_capacity:
-#             selected_items.append(item)
-#             total_weight += item['weight']
-#             total_profit += item['profit']
-#         else:
-#             break
-
-#     return selected_items, total_weight, total_profit
-
-# # Memanggil fungsi dan menampilkan hasil
-# selected_items, total_weight, total_profit = greedy_by_weight(items, max_capacity)
-
-# print("Barang yang dipilih:")
-# for item in selected_items:
-#     print(f"Barang {item['item']}: Berat = {item['weight']} kg, Profit = ${item['profit']}")
-
-# print(f"\nTotal Berat: {total_weight} kg")
-# print(f"Total Profit: ${total_profit}")

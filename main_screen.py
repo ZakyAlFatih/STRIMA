@@ -1,6 +1,47 @@
 import streamlit as st
-import time
+import timeit
 from itertools import combinations
+
+
+st.sidebar.title("Description")
+st.sidebar.info(
+    """
+    **Jastiper Best Friend** is your go-to app for optimizing your shopping list.
+    Whether you are trying to maximize profit or minimize weight, we provide the best 
+    solutions using both greedy algorithms and brute force methods. Our app is designed 
+    to help you make the best decisions effortlessly.
+    """
+)
+
+st.sidebar.header("About Us")
+st.sidebar.image("./images/aboutusfix_tubesStrima.png")
+
+
+
+st.title("Jastiper Best Friend")
+
+
+def calculate_value_weight(combination, val, wt):
+    total_value = sum(val[i] for i in combination)
+    total_weight = sum(wt[i] for i in combination)
+    return total_value, total_weight
+
+# Function to find all possible combinations of items and return the best one
+def knapSackBruteForce(W, weights, profits, n, items):
+    max_value = 0
+    best_combination = []
+    all_combinations = []
+
+    for r in range(n + 1):
+        for combination in combinations(range(n), r):
+            total_value, total_weight = calculate_value_weight(combination, profits, weights)
+            comb_items = [items[i] for i in combination]
+            all_combinations.append((comb_items, total_value, total_weight))
+            if total_weight <= W and total_value > max_value:
+                max_value = total_value
+                best_combination = combination
+
+    return max_value, best_combination, all_combinations
 
 st.subheader("How many items do you want to input?")
 itemtotal = st.number_input("Enter an integer for total items:", min_value=0, value=0, key="itemtotal")
@@ -64,93 +105,16 @@ def greedy_algorithm(items_data, max_capacity, strategy):
 
     return selected_items, total_weight, total_profit
 
-def calculate_value_weight(combination, val, wt):
-    total_value = sum(val[i] for i in combination)
-    total_weight = sum(wt[i] for i in combination)
-    return total_value, total_weight
+# Gabungkan semua informasi barang dalam satu list
+items_data = [{'name': items[i], 'weight': weights[i], 'profit': profits[i]} for i in range(itemtotal)]
 
-def knapSackBruteForce(W, weights, profits, n, items):
-    max_value = 0
-    best_combination = []
-    all_combinations = []
-
-    for r in range(n + 1):
-        for combination in combinations(range(n), r):
-            total_value, total_weight = calculate_value_weight(combination, profits, weights)
-            comb_items = [items[i] for i in combination]
-            all_combinations.append((comb_items, total_value, total_weight))
-            if total_weight <= W and total_value > max_value:
-                max_value = total_value
-                best_combination = combination
-
-    return max_value, best_combination, all_combinations
-
-#main program
-if itemtotal > 0:
-    # Gabungkan semua informasi barang dalam satu list
-    items_data = [{'name': items[i], 'weight': weights[i], 'profit': profits[i]} for i in range(itemtotal)]
-    
-    #start greedy
-    start_time_greedy = time.time()
-    
-    # Algoritma greedy by weight
+# Measure execution time for greedy algorithms including the best option selection
+def measure_greedy_time():
     selected_items_weight, total_weight_weight, total_profit_weight = greedy_algorithm(items_data, max_capacity, "weight")
-
-    # Algoritma greedy by profit
     selected_items_profit, total_weight_profit, total_profit_profit = greedy_algorithm(items_data, max_capacity, "profit")
-
-    # Algoritma greedy by density
     selected_items_density, total_weight_density, total_profit_density = greedy_algorithm(items_data, max_capacity, "density")
 
-    end_time_greedy = time.time()
-    execution_time_greedy =( end_time_greedy - start_time_greedy )* 1000000000000
-    
-    # Menampilkan hasil greedy by weight
-    st.subheader("Selected Items by Weight")
-    if selected_items_weight:
-        selected_data_weight = {
-            "Name": [item['name'] for item in selected_items_weight],
-            "Weight": [item['weight'] for item in selected_items_weight],
-            "Profit": [item['profit'] for item in selected_items_weight]
-        }
-        st.table(selected_data_weight)
-        st.write(f"Total Weight: {total_weight_weight} kg")
-        st.write(f"Total Profit: ${total_profit_weight}")
-    else:
-        st.write("No items selected.")
-
-    # Menampilkan hasil greedy by profit
-    st.subheader("Selected Items by Profit")
-    if selected_items_profit:
-        selected_data_profit = {
-            "Name": [item['name'] for item in selected_items_profit],
-            "Weight": [item['weight'] for item in selected_items_profit],
-            "Profit": [item['profit'] for item in selected_items_profit]
-        }
-        st.table(selected_data_profit)
-        st.write(f"Total Weight: {total_weight_profit} kg")
-        st.write(f"Total Profit: ${total_profit_profit}")
-    else:
-        st.write("No items selected.")
-
-    # Menampilkan hasil greedy by density
-    st.subheader("Selected Items by Density")
-    if selected_items_density:
-        selected_data_density = {
-            "Name": [item['name'] for item in selected_items_density],
-            "Weight": [item['weight'] for item in selected_items_density],
-            "Profit": [item['profit'] for item in selected_items_density]
-        }
-        st.table(selected_data_density)
-        st.write(f"Total Weight: {total_weight_density} kg")
-        st.write(f"Total Profit: ${total_profit_density}")
-    else:
-        st.write("No items selected.")
-    
-    # Mencari opsi terbaik
-    st.subheader("The Best Option")
     profmax = max(total_profit_weight, total_profit_profit, total_profit_density)
-
     if profmax == total_profit_weight:
         best_items = selected_items_weight
     elif profmax == total_profit_profit:
@@ -158,6 +122,17 @@ if itemtotal > 0:
     else:
         best_items = selected_items_density
 
+    return best_items, profmax
+
+if itemtotal > 0:
+    greedy_execution_time = timeit.timeit(measure_greedy_time, number=1) * 1_000_000  # in microseconds
+    
+    
+    # Get the best greedy solution
+    best_items, profmax = measure_greedy_time()
+
+    # Display the best greedy solution
+    st.subheader("The Best Option Based on Greedy Result")
     if best_items:
         best_data = {
             "Name": [item['name'] for item in best_items],
@@ -169,23 +144,24 @@ if itemtotal > 0:
         st.write(f"Total Profit: ${profmax}")
     else:
         st.write("No items selected.")
+    st.write(f"Execution time for Greedy algorithms: {greedy_execution_time:.2f} microseconds")
     
-    st.write(f"Greedy Algorithm Execution Time: {execution_time_greedy} seconds")
+    # Measure execution time for brute force algorithm
+    def measure_brute_force_time():
+        knapSackBruteForce(max_capacity, weights, profits, itemtotal, items)
     
+    brute_force_execution_time = timeit.timeit(measure_brute_force_time, number=1) * 1_000_000  # in microseconds
+    
+
     # Brute force solution
-    start_time_brute_force = time.time()
-    
     max_prof, best_combination, all_combinations = knapSackBruteForce(max_capacity, weights, profits, itemtotal, items)
 
-    end_time_brute_force = time.time()
-    execution_time_brute_force = (end_time_brute_force - start_time_brute_force)*1000000000000
-    
     # Output all combinations
     st.subheader("Brute Force Way")
     all_combinations_data = {
-        "Items": [", ".join(comb_items) for comb_items, _, _ in all_combinations],
-        "Total Value": [total_value for _, total_value, _ in all_combinations],
-        "Total Weight": [total_weight for _, _, total_weight in all_combinations]
+        "Name": [", ".join(comb_items) for comb_items, _, _ in all_combinations],
+        "Weight": [total_value for _, total_value, _ in all_combinations],
+        "Profit": [total_weight for _, _, total_weight in all_combinations]
     }
 
     # Output all combinations as a table
@@ -194,11 +170,36 @@ if itemtotal > 0:
 
     # Output the maximum value and the best combination
     best_comb_items = [items[i] for i in best_combination]
-    st.write(f"\nMaximum Profit that can we get = {max_prof}")
+    st.write(f"\nMaximum Profit that can we get : ${max_prof}")
+    st.write(f"Total weight : {sum(weights[i] for i in best_combination)}")
     st.write("Items included in the best combination:")
     best_comb_data = {
         "Name": best_comb_items
     }
     st.table(best_comb_data)
+    st.write(f"Execution time for Brute Force algorithm: {brute_force_execution_time:.2f} microseconds")
+
+    #profmax = greedy
+    #max_prof = brute force
+    # best_items = greedy
+    # best_comb_items = brute force
     
-    st.write(f"Brute Force Execution Time: {execution_time_brute_force} seconds")
+    if profmax > max_prof:
+        best_option = profmax
+        final_best_items = best_items 
+        final_weight = sum(item['weight'] for item in best_items)
+    else:
+        best_option = max_prof
+        final_best_items = best_comb_items
+        final_weight = sum(weights[i] for i in best_combination)
+
+    st.header("Best Option Between Greedy and Brute Force")
+    final_best_data = {
+        "Name": final_best_items,
+        "Weight": [weights[items.index(name)] for name in final_best_items],
+        "Profit": [profits[items.index(name)] for name in final_best_items]
+    }
+    st.table(final_best_data)
+    st.write(f"Total Weight: {final_weight} kg")
+    st.write(f"Maximum Profit: ${best_option}")
+

@@ -133,6 +133,7 @@ if itemtotal > 0:
     # Get the best greedy solution
     best_items, profmax = measure_greedy_time()
 
+
     # Display the best greedy solution
     st.subheader("The Best Option Based on Greedy Result")
     if best_items:

@@ -42,7 +42,7 @@ def knapSackBruteForce(W, weights, profits, n, items):
 st.subheader("How many items do you want to input?")
 itemtotal = st.number_input("Enter an integer for total items:", min_value=0, value=0, key="itemtotal")
 
-st.subheader("Insert the maximum capacity?")
+st.subheader("Insert the maximum capacity? (gr)")
 max_capacity = st.number_input("Enter an integer for max capacity:", min_value=0, value=0, key="max_capacity")
 
 # List untuk menyimpan data
@@ -136,8 +136,8 @@ if itemtotal > 0:
             "Profit": [item['profit'] for item in greedy_weight_items]
         }
         st.table(greedy_weight_data)
-        st.write(f"Total Weight: {greedy_weight_total} kg")
-        st.write(f"Total Profit: ${greedy_weight_profit}")
+        st.write(f"Total Weight: {greedy_weight_total} gr")
+        st.write(f"Total Profit: Rp{greedy_weight_profit}")
     else:
         st.write("No items selected for weight strategy.")
 
@@ -151,8 +151,8 @@ if itemtotal > 0:
             "Profit": [item['profit'] for item in greedy_profit_items]
         }
         st.table(greedy_profit_data)
-        st.write(f"Total Weight: {greedy_profit_total} kg")
-        st.write(f"Total Profit: ${greedy_profit_profit}")
+        st.write(f"Total Weight: {greedy_profit_total} gr")
+        st.write(f"Total Profit: Rp{greedy_profit_profit}")
     else:
         st.write("No items selected for profit strategy.")
 
@@ -166,8 +166,8 @@ if itemtotal > 0:
             "Profit": [item['profit'] for item in greedy_density_items]
         }
         st.table(greedy_density_data)
-        st.write(f"Total Weight: {greedy_density_total} kg")
-        st.write(f"Total Profit: ${greedy_density_profit}")
+        st.write(f"Total Weight: {greedy_density_total} gr")
+        st.write(f"Total Profit: Rp{greedy_density_profit}")
     else:
         st.write("No items selected for density strategy.")
 
@@ -187,8 +187,8 @@ if itemtotal > 0:
             "Profit": [item['profit'] for item in best_items]
         }
         st.table(best_data)
-        st.write(f"Total Weight: {sum(item['weight'] for item in best_items)} kg")
-        st.write(f"Total Profit: ${profmax}")
+        st.write(f"Total Weight: {sum(item['weight'] for item in best_items)} gr")
+        st.write(f"Total Profit: Rp{profmax}")
     else:
         st.write("No items selected.")
     st.write(f"Execution time for Greedy algorithms: {greedy_execution_time:.2f} microseconds")
@@ -210,16 +210,32 @@ if itemtotal > 0:
 
     # Output the maximum value and the best combination
     best_comb_items = [items[i] for i in best_combination]
-    st.write(f"\nMaximum Profit that can we get : ${max_prof}")
-    st.write(f"Total weight : {sum(weights[i] for i in best_combination)} kg")
+    st.write(f"\nMaximum Profit that can we get : Rp{max_prof}")
+    st.write(f"Total weight : {sum(weights[i] for i in best_combination)} gr")
+    st.write(f"Execution time for Brute Force algorithm: {brute_force_execution_time:.2f} microseconds")
     st.write("Items included in the best combination:")
     best_comb_data = {
         "Name": best_comb_items
     }
     st.table(best_comb_data)
-    st.write(f"Execution time for Brute Force algorithm: {brute_force_execution_time:.2f} microseconds")
+   
 
     # Compare the best option between Greedy and Brute Force
     if profmax > max_prof:
         best_option = profmax
-        final_best_items = best_items
+        final_best_items = best_items 
+        final_weight = sum(item['weight'] for item in best_items)
+    else:
+        best_option = max_prof
+        final_best_items = best_comb_items
+        final_weight = sum(weights[i] for i in best_combination)
+
+    st.header("Best Option Between Greedy and Brute Force")
+    final_best_data = {
+        "Name": final_best_items,
+        "Weight": [weights[items.index(name)] for name in final_best_items],
+        "Profit": [profits[items.index(name)] for name in final_best_items]
+    }
+    st.table(final_best_data)
+    st.write(f"Total Weight: {final_weight} gr")
+    st.write(f"Maximum Profit: Rp{best_option}")
